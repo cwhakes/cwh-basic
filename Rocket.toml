@@ -2,6 +2,8 @@
 address = "localhost"
 port = 8000
 limits = { forms = 32768 }
+username = "admin"
+password = "password"
 
 [production]
 address = "0.0.0.0"
