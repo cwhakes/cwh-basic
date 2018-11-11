@@ -5,7 +5,7 @@ ENV SOURCES=/sources
 
 RUN yum update -y
 RUN yum install -y file gcc openssl-devel
-RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=nightly --disable-sudo
+RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=nightly --date=2018-10-31 --disable-sudo
 
 RUN mkdir -p $SOURCES
 COPY ./ $SOURCES
