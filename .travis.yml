@@ -1,6 +1,6 @@
 language: rust
 rust:
-- nightly
+- nightly-2018-10-31
 deploy:
   provider: heroku
   app: cwh-basic
