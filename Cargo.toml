@@ -1,0 +1,12 @@
+[package]
+name = "cwh-basic"
+version = "0.1.0"
+authors = ["Will Hakes <info@cwilliamhakes.com>"]
+
+[dependencies]
+rocket = "0.4.0-rc.1"
+
+[dependencies.rocket_contrib]
+version = "0.4.0-rc.1"
+default-features = false
+features = ["handlebars_templates", "serve"]

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        border: 0;
+        overflow: hidden; /*  Disable scrollbars */
+        display: block;  /* No floating content on sides */
+      }
+      </style>
+  </head>
+
+  <body>
+    <canvas id="canvas" style='position:absolute; left:0px; top:0px; width: 120px; height:264px'></canvas>
+
+<script>
+
+  document.getElementById("canvas").height = 264;
+  document.getElementById("canvas").width = 120;
+
+  // Returns an object containing resources that will be used later for drawing
+  function resources() {
+    let res = {
+      block: document.createElement('canvas'),
+    }
+
+    // Block
+    res.block.width = 12;
+    res.block.height = 12;
+    let plCtx = res.block.getContext('2d');
+    plCtx.fillStyle = "green";
+    plCtx.beginPath();
+    plCtx.lineTo(12, 0);
+    plCtx.lineTo(12, 12);
+    plCtx.lineTo(0, 12);
+    plCtx.lineTo(0, 0);
+    plCtx.fill();
+
+    return res;
+  }
+
+  // We create this here because it will be used from within `imports`
+  let canvas = document.getElementById('canvas');
+
+  // Returns an object containing functions that will be linked to our wasm model
+  // This means that they can be called from Rust
+  function imports() {
+    const res = resources();
+    var ctx = canvas.getContext("2d");
+
+    function clear_screen() {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function draw_block(x, y) {
+      ctx.drawImage(res.block, x, 264 - y - 12);
+    }
+
+    function draw_score(x) {
+      ctx.fillStyle = "orange";
+      ctx.textBaseline = "top";
+      ctx.font = "20px sans-serif";
+      ctx.fillText('Score: ' + x, 12, 12)
+    }
+
+    // The real loading and running of our wasm starts here
+    let imports = { clear_screen, draw_block, draw_score };
+    return imports;
+  }
+
+  // Fetch and instantiate our wasm module
+  // TODO: Make less fragile. If the directory name changes or is no longer in root, this will break
+  fetch("../tetris/program.wasm").then(response =>
+    response.arrayBuffer()
+  ).then(bytes =>
+    WebAssembly.instantiate(bytes, { env: imports() })
+  ).then(results => {
+    let module = {};
+    let mod = results.instance;
+    module.update = mod.exports.update;
+    module.rotate_sunwise = mod.exports.rotate_sunwise;
+    module.rotate_widdershins = mod.exports.rotate_widdershins;
+    module.move_left = mod.exports.move_left;
+    module.move_right = mod.exports.move_right;
+    module.drop_block = mod.exports.drop_block;
+    //module.resize = mod.exports.resize;
+    module.draw = mod.exports.draw;
+
+    // Input processing
+    function processKey(key) {
+      switch (key) {
+        case "z":
+          module.rotate_widdershins();
+          break;
+        case "x":
+          module.rotate_sunwise();
+          break;
+        case ",":
+          module.move_left();
+          break;
+        case ".":
+          module.move_right();
+          break;
+        case " ":
+          module.drop_block();
+          break;
+      }
+    }
+    document.addEventListener('keydown', e => processKey(e.key));
+
+/*not implemented yet
+    // Resizing
+    function resize() {
+      // We make the canvas somewhat smaller to get some zooming
+      canvas.width = window.innerWidth * 0.8;
+      canvas.height = window.innerHeight * 0.8;
+      module.resize(canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', () => {
+      resize();
+    });
+*/
+
+    // Game loop
+    let start = null;
+    let prevTimestamp = null;
+    let drawAndUpdate = (timestamp) => {
+      // Initialization
+      if (!prevTimestamp) {
+        start = timestamp;
+        prevTimestamp = timestamp;
+        requestAnimationFrame(drawAndUpdate);
+        return;
+      }
+
+      // Update and draw
+      let progress = (timestamp - prevTimestamp) / 1000;
+      module.update(progress);
+      module.draw();
+
+      // Some bookkeeping
+      prevTimestamp = timestamp;
+      requestAnimationFrame(drawAndUpdate);
+    };
+
+    //resize();
+    drawAndUpdate();
+  });
+  </script>
+  </body>
+</html>
