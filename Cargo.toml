@@ -4,6 +4,7 @@ version = "0.1.1"
 authors = ["Will Hakes <info@cwilliamhakes.com>"]
 
 [dependencies]
+bcrypt = "0.2.1"
 rocket = "0.4.2"
 
 [dependencies.rocket_contrib]

@@ -3,7 +3,8 @@ address = "localhost"
 port = 8000
 limits = { forms = 32768 }
 username = "admin"
-password = "password"
+# password = "password"
+passhash = "$2y$12$asO0HlD87cjf9Ed6kHBAMOThja9VTYnQYUSzUxuCKy/ro5ylyyVcy"
 
 [production]
 address = "0.0.0.0"

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use bcrypt::verify;
 use rocket::fairing::AdHoc;
-use rocket::outcome::IntoOutcome;
 use rocket::request::{Form, FlashMessage};
 use rocket::response::{Redirect, Flash};
 use rocket::http::{Cookie, Cookies};
@@ -26,8 +26,10 @@ pub fn login_page(flash: Option<FlashMessage>) -> Template {
 
 
 #[post("/login", data = "<login>")]
-pub fn login(mut cookies: Cookies, login: Form<Login>, valid_login: State<Login>) -> Result<Flash<Redirect>, Flash<Redirect>> {
-    if *login == *valid_login {
+pub fn login(mut cookies: Cookies, login: Form<Login>, valid_login: State<(String, String)>) -> Result<Flash<Redirect>, Flash<Redirect>> {
+    if (*login.username == (*valid_login).0) &
+        (verify(&login.password, &(*valid_login).1).expect("Could not hash password"))
+    {
         cookies.add_private(Cookie::new("user_id", 1.to_string()));
         Ok(Flash::success(Redirect::to(uri!(login_page)), "Correct username/password."))
     } else {
@@ -44,10 +46,10 @@ pub fn logout(mut cookies:Cookies) -> Flash<Redirect> {
 pub fn get_valid_login() -> AdHoc {
     AdHoc::on_attach("Login Credentials", |rocket| {
 
-        let valid_login = Login {
-            username: rocket.config().get_str("username").expect("No Username").to_owned(),
-            password: rocket.config().get_str("password").expect("No Password").to_owned(),
-        };
+        let valid_login = (
+            rocket.config().get_str("username").expect("No Username").to_owned(),
+            rocket.config().get_str("passhash").expect("No Passhash").to_owned(),
+        );
 
         Ok(rocket.manage(valid_login))
     })

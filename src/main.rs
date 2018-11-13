@@ -1,7 +1,8 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-extern crate rocket_contrib;
+extern crate bcrypt;
 #[macro_use] extern crate rocket;
+extern crate rocket_contrib;
 
 mod login;
 
