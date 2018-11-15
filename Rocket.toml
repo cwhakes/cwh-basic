@@ -6,6 +6,11 @@ username = "admin"
 # password = "password"
 passhash = "$2y$12$asO0HlD87cjf9Ed6kHBAMOThja9VTYnQYUSzUxuCKy/ro5ylyyVcy"
 
+[staging]
+address = "0.0.0.0"
+port = 8080
+limits = { forms = 32768 }
+
 [production]
 address = "0.0.0.0"
 port = 8080

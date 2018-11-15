@@ -14,4 +14,4 @@ COPY ./ $SOURCES
 WORKDIR $SOURCES
 RUN cargo build --release
 
-CMD ROCKET_ENV=production ROCKET_PORT=$PORT ./target/release/cwh-basic
+CMD ROCKET_PORT=$PORT ./target/release/cwh-basic
