@@ -2,10 +2,11 @@ FROM centos:7
 MAINTAINER Will Hakes <info@cwilliamhakes.com>
 
 ENV SOURCES=/sources
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN yum update -y
 RUN yum install -y file gcc openssl-devel
-RUN curl -sSf https://static.rust-lang.org/rustup.sh | sh -s -- --channel=nightly --date=2018-10-31 --disable-sudo
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y -v --default-toolchain nightly-2020-01-02
 
 RUN mkdir -p $SOURCES
 COPY ./ $SOURCES
