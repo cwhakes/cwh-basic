@@ -3,12 +3,6 @@ MAINTAINER Will Hakes <info@cwilliamhakes.com>
 
 ENV SOURCES=/sources
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN echo $DATABASE_URL_FAKE
-ENV ROCKET_DATABASES='{content_db={url=${DATABASE_URL_FAKE}}}'
-RUN echo $ROCKET_DATABASES
-ENV ROCKET_DATABASES="{content_db={url=${DATABASE_URL_FAKE}}}"
-RUN echo $ROCKET_DATABASES
-
 
 RUN yum update -y
 RUN yum install -y file gcc openssl-devel
@@ -20,5 +14,5 @@ COPY ./ $SOURCES
 WORKDIR $SOURCES
 RUN cargo build --release
 
-ENV ROCKET_DATABASES='{content_db={url=$DATABASE_URL}}'
-CMD ROCKET_ENV=production ROCKET_PORT=$PORT ./target/release/cwh-basic
+CMD ROCKET_DATABASES="{content_db={url=${DATABASE_URL}}}" \
+    ROCKET_ENV=production ROCKET_PORT=$PORT ./target/release/cwh-basic
