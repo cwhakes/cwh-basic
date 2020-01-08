@@ -1,10 +1,12 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-extern crate rocket_contrib;
+#[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate rocket;
 use rocket::Request;
 use rocket_contrib::serve::{StaticFiles, Options};
 use rocket_contrib::templates::Template;
+
+mod blog;
 
 #[catch(404)]
 fn not_found(req: &Request) -> Template {
@@ -15,8 +17,10 @@ fn not_found(req: &Request) -> Template {
 
 fn main() {
     rocket::ignite()
+        .attach(blog::ContentDb::fairing())
         .attach(Template::fairing())
         .mount("/", StaticFiles::new("static", Options::Index))
+        .mount("/", routes![blog::blog])
         .register(catchers![not_found])
         .launch();
 }
