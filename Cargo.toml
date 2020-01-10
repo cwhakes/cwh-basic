@@ -5,6 +5,7 @@ authors = ["Will Hakes <info@cwilliamhakes.com>"]
 
 [dependencies]
 rocket = "0.4.2"
+handlebars-markdown-helper = "0.7.0"
 
 [dependencies.rocket_contrib]
 version = "0.4.2"
