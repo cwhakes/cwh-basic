@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="/style.css">
   </head>
   <body>
-    {{ markdown body }}
+    <h1>{{ title }}</h1>
+    <p><time>{{ date }}</time></p>
+    <div>
+      {{ markdown body }}
+    </div>
+    <div>
+      <span><a href="/blog/{{ prev_path }}">{{ prev_title }}</a></span>
+      <span><a href="/blog/{{ next_path }}">{{ next_title }}</a></span>
+    </div>
   </body>
 </html>

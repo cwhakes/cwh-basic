@@ -2,6 +2,7 @@
 
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate rocket;
+extern crate chrono;
 extern crate handlebars_markdown_helper;
 use rocket::Request;
 use rocket_contrib::serve::{StaticFiles, Options};
