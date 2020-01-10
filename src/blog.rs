@@ -1,4 +1,5 @@
 use rocket::http::Status;
+use rocket::response::Redirect;
 use rocket_contrib::databases::postgres;
 use rocket_contrib::templates::Template;
 use chrono::{DateTime, Utc};
@@ -45,6 +46,22 @@ impl ContentDb {
         })
     }
 }
+
+#[get("/blog")]
+pub fn latest_blog(content: ContentDb) -> Result<Redirect, Status> {
+    let query_result = content.query(
+        "SELECT path FROM blog_posts
+        ORDER BY ordinal DESC
+        FETCH FIRST ROW ONLY",
+        &[],
+    );
+    let path_rows = query_result.or(Err(Status::InternalServerError))?;
+    let path_row = path_rows.iter().next().ok_or(Status::InternalServerError)?;
+    let path: String = path_row.get_opt("path").map(Result::ok).flatten().ok_or(Status::InternalServerError)?;
+
+    Ok(Redirect::to(format!("/blog/{}", path)))
+}
+
 
 #[get("/blog/<path>")]
 pub fn blog(content: ContentDb, path: String) -> Result<Template, Status> {

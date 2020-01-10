@@ -27,7 +27,7 @@ fn main() {
             );
         }))
         .mount("/", StaticFiles::new("static", Options::Index))
-        .mount("/", routes![blog::blog])
+        .mount("/", routes![blog::blog, blog::latest_blog])
         .register(catchers![not_found])
         .launch();
 }
