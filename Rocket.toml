@@ -3,13 +3,25 @@ address = "localhost"
 port = 8000
 limits = { forms = 32768 }
 
-[development.databases]
-content_db = {url = "postgresql://test_user:password@localhost:5432/postgres"}
+[development.databases.content_db]
+url = "postgresql://test_user:password@localhost:5432/postgres"
+pool_size = 4
+
+[staging]
+address = "0.0.0.0"
+port = 8080
+limits = { forms = 32768 }
+
+[staging.databases.content_db]
+# url provided by ENV variable
+pool_size = 4
+
 
 [production]
 address = "0.0.0.0"
 port = 8080
 limits = { forms = 32768 }
 
-[production.databases]
-# content_db provided by ENV variable
+[production.databases.content_db]
+# url provided by ENV variable
+pool_size = 12
