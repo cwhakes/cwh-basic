@@ -14,5 +14,5 @@ COPY ./ $SOURCES
 WORKDIR $SOURCES
 RUN cargo build --release
 
-CMD ROCKET_DATABASES="{content_db={url=${DATABASE_URL}, pool_size = 8 }}" \
+CMD ROCKET_DATABASES="{content_db={url=${DATABASE_URL}, pool_size=8}}" \
     ROCKET_PORT=$PORT ./target/release/cwh-basic
