@@ -1,6 +1,6 @@
 language: rust
 rust:
-- nightly-2020-01-02
+- nightly-2021-04-23
 deploy:
   provider: heroku
   app:
