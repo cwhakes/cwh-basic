@@ -20,7 +20,7 @@ fn not_found(req: &Request) -> Template {
 
 fn main() {
     rocket::ignite()
-        .attach(blog::ContentDb::fairing())
+        //.attach(blog::ContentDb::fairing())
         .attach(Template::custom(|engine| {
             engine.handlebars.register_helper(
                 "markdown", Box::new(markdown_helper)
