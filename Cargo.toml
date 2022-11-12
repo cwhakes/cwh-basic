@@ -1,19 +1,21 @@
 [package]
 name = "cwh-basic"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Will Hakes <info@cwilliamhakes.com>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-rocket = "0.4.7"
-chrono = "0.4.19"
-handlebars-markdown-helper = "0.7.0"
+rocket = "0.5.0-rc.2"
+chrono = "0.4.22"
 
-[dependencies.rocket_contrib]
-version = "0.4.7"
-default-features = false
-features = ["handlebars_templates", "postgres_pool", "serve"]
+[dependencies.rocket_dyn_templates]
+version = "0.1.0-rc.2"
+features = ["handlebars"]
+
+[dependencies.rocket_sync_db_pools]
+version = "0.1.0-rc.2"
+features = ["postgres_pool"]
 
 [dependencies.postgres]
-version = "0.15.1"
-features = ["with-chrono"]
+version = "0.19.4"
+features = ["with-chrono-0_4"]

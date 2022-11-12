@@ -1,33 +1,47 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#[macro_use]
+extern crate rocket;
 
-#[macro_use] extern crate rocket_contrib;
-#[macro_use] extern crate rocket;
-extern crate chrono;
-extern crate handlebars_markdown_helper;
+use rocket::fs::{relative, FileServer, Options};
 use rocket::Request;
-use rocket_contrib::serve::{StaticFiles, Options};
-use rocket_contrib::templates::Template;
-use handlebars_markdown_helper::markdown_helper;
+use rocket_dyn_templates::{
+    context,
+    handlebars::{self, JsonRender},
+    Template,
+};
 
-mod blog;
+// mod blog;
 
 #[catch(404)]
 fn not_found(req: &Request) -> Template {
-    let mut map = std::collections::HashMap::new();
-    map.insert("path", req.uri().path());
-    Template::render("error/404", &map)
+    Template::render("error/404", context! { path: req.uri().path().as_str() })
 }
 
-fn main() {
-    rocket::ignite()
+fn markdown_helper(
+    h: &handlebars::Helper<'_, '_>,
+    _: &handlebars::Handlebars,
+    _: &handlebars::Context,
+    _: &mut handlebars::RenderContext<'_, '_>,
+    out: &mut dyn handlebars::Output,
+) -> handlebars::HelperResult {
+    if let Some(param) = h.param(0) {
+        out.write("<b><i>")?;
+        out.write(&param.value().render())?;
+        out.write("</b></i>")?;
+    }
+
+    Ok(())
+}
+
+#[launch]
+fn rocket() -> _ {
+    rocket::build()
         //.attach(blog::ContentDb::fairing())
         .attach(Template::custom(|engine| {
-            engine.handlebars.register_helper(
-                "markdown", Box::new(markdown_helper)
-            );
+            engine
+                .handlebars
+                .register_helper("markdown", Box::new(markdown_helper));
         }))
-        .mount("/", StaticFiles::new("static", Options::Index))
-        .mount("/", routes![blog::blog, blog::latest_blog])
-        .register(catchers![not_found])
-        .launch();
+        .mount("/", FileServer::new(relative!("static"), Options::Index))
+        // .mount("/", routes![blog::blog, blog::latest_blog])
+        .register("/", catchers![not_found])
 }
