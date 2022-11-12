@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::fs::{relative, FileServer, Options};
+use rocket::fs::{FileServer, Options};
 use rocket::Request;
 use rocket_dyn_templates::{
     context,
@@ -41,7 +41,7 @@ fn rocket() -> _ {
                 .handlebars
                 .register_helper("markdown", Box::new(markdown_helper));
         }))
-        .mount("/", FileServer::new(relative!("static"), Options::Index))
+        .mount("/", FileServer::new("static", Options::Index))
         // .mount("/", routes![blog::blog, blog::latest_blog])
         .register("/", catchers![not_found])
 }

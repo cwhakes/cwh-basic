@@ -1,18 +1,22 @@
-FROM centos:7
-MAINTAINER Will Hakes <info@cwilliamhakes.com>
+FROM rust:1.65 as builder
 
-ENV SOURCES=/sources
-ENV PATH="/root/.cargo/bin:${PATH}"
-
-RUN yum update -y
-RUN yum install -y file gcc openssl-devel
-RUN curl -sSf https://sh.rustup.rs | sh -s -- -y -v --default-toolchain nightly-2022-11-11
-
-RUN mkdir -p $SOURCES
-COPY ./ $SOURCES
-
-WORKDIR $SOURCES
+# Make a dummy
+WORKDIR /usr/src
+RUN USER=root cargo new cwh-basic
+COPY Cargo.toml Cargo.lock /usr/src/cwh-basic/
+WORKDIR /usr/src/cwh-basic
 RUN cargo build --release
 
+# Make the real thing
+COPY src /usr/src/cwh-basic/src/
+RUN touch src/main.rs
+RUN cargo build --release \
+    && mv target/release/cwh-basic /bin
+
+FROM debian:buster-slim as runner
+WORKDIR /app
+COPY --from=builder /bin/cwh-basic /bin/cwh-basic
+COPY . /app
+
 CMD ROCKET_DATABASES="{content_db={url=${DATABASE_URL}, pool_size=8}}" \
-    ROCKET_PORT=$PORT ./target/release/cwh-basic
+    ROCKET_PORT=$PORT cwh-basic
