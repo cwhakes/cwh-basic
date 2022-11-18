@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [Rust_CI]
     types: [completed]
-    branches: [azure]
+    branches: [master]
 
 jobs:
   build:
