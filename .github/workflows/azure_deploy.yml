@@ -22,6 +22,7 @@ jobs:
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v0
         with:
+          appSourcePath: ${{ github.workspace }}
           acrName: cwhcontainerregistry
           containerAppName: cwh-basic
           resourceGroup: personal_website
