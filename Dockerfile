@@ -24,6 +24,5 @@ COPY Rocket.toml ./
 COPY --from=builder /bin/$NAME /bin/
 
 ENV NAME=$NAME
-CMD ROCKET_DATABASES="{content_db={url=${DATABASE_URL}, pool_size=8}}" \
-    ROCKET_PORT=$PORT \
-    $NAME
+CMD ROCKET_PORT=$PORT \
+    cwh-basic
