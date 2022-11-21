@@ -4,7 +4,7 @@
 extern crate rocket;
 
 use rocket::fs::{FileServer, Options};
-use rocket::Request;
+use rocket::{Build, Request, Rocket};
 use rocket_dyn_templates::{
     context,
     handlebars::{self, JsonRender},
@@ -39,9 +39,7 @@ fn markdown_helper(
     Ok(())
 }
 
-#[launch]
-fn rocket() -> _ {
-    eprintln!("Preparing for liftoff...");
+fn build() -> Rocket<Build> {
     rocket::build()
         //.attach(blog::ContentDb::fairing())
         .attach(Template::custom(|engine| {
@@ -53,4 +51,16 @@ fn rocket() -> _ {
         .mount("/", FileServer::new("static", Options::Index))
         // .mount("/", routes![blog::blog, blog::latest_blog])
         .register("/", catchers![not_found])
+}
+
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    eprintln!("Assembling vehicle...");
+    let vehicle = build();
+    eprintln!("Preparing for liftoff...");
+    let vehicle = vehicle.ignite().await?;
+    eprintln!("Listening on port: {}", vehicle.config().port);
+    let _vehicle = vehicle.launch().await?;
+
+    Ok(())
 }
